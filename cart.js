@@ -79,3 +79,19 @@ function checkOut() {
         }
     });
 }
+
+function receipt() {
+    $.ajax({
+        url: Url + "Cart",
+        type: 'put',
+        dataType: 'json',
+        data: JSON.stringify({"email":email}),
+        contentType: 'text/plain',
+        success: function (data) {
+            alert("Your Reciept: You've purchased " + itemCount + " items for a total of $" + totalPrice);
+        },
+        error: function (data) {
+            alert("Error while retrieving your reciept");
+        }
+    });
+}
