@@ -75,6 +75,9 @@ function fetchOneProduct($id) {
         success: function (data) {
             product='';
 
+            const averageScore = getAverageScoreById(data['data']['List'][0]['id']);
+            console.log("average score: " + averageScore);
+
             product = '<div class="card justify-content-center pagination-centered" style="width:900px; height:auto">\n' +
                 '            <div class="container-fliud">\n' +
                 '                <div class="wrapper row">\n' +
@@ -94,6 +97,7 @@ function fetchOneProduct($id) {
                 '                        <h6 class="price">Weight: <span>'+data['data']['List'][0]['item_weight']+'</span></h6>\n' +
                 '                        <h6 class="price">Camera: <span>'+data['data']['List'][0]['camera_description']+'</span></h6>\n' +
                 '                        <h6 class="price">Operating System: <span>'+data['data']['List'][0]['operating_system']+'</span></h6>\n' +
+                '                        <h6 class="price">Average Score: <span id="average-score">'+'loading...'+'</span></h6>\n' +
                 '                        <div class="action">\n' +
                 '                            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#exampleModal" data-whatever="'+data['data']['List'][0]['id']+'" >Submit Comment</button>\n' +
                 '                        </div>\n' +
@@ -155,6 +159,37 @@ function fetchComments($id) {
             comment=comment+'</ul></div></div>'
             $('#comment-list').html(comment);
 
+        },
+        error: function (data) { //on error, throw an alert
+            alert("Error while fetching data.");
+        }
+    });
+}
+
+function getAverageScoreById($id){
+    $.ajax({
+        url: Url+'GetProductComment',
+        type: 'get',
+        dataType: 'json',
+        data: {"product_id":$id}, //the json is defined here using javascript's dictionary syntax.
+        contentType: 'text/plain',
+
+        success: function (data) { //on success
+            let scoreSum = 0;
+            let scoreCount = 0;
+            
+            $.each(data['data']['List'], function(i, item) {
+                if(item['score']){
+                    scoreSum += item['score'];
+                    scoreCount++;
+                };
+            });
+
+            const averageScore = scoreSum/scoreCount;
+
+            const averageScoreText = scoreCount > 0 ? averageScore.toFixed(2) : 'No Scores';
+
+            $('#average-score').html(averageScoreText);
         },
         error: function (data) { //on error, throw an alert
             alert("Error while fetching data.");
